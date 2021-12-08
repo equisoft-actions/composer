@@ -1,0 +1,64 @@
+name: composer
+description: Install composer dependencies
+
+inputs:
+  prod:
+    description: If true, dont load dev dependancies and optimize autoloaders.
+    required: false
+    type: boolean
+    default: false
+  check_platform_reqs:
+    description: Run composer check-platform-reqs
+    required: false
+    type: boolean
+    default: true
+  gpr_key:
+    description: Personal access token to fetch private repos
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get composer cache directory
+      id: composer-cache
+      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      shell: bash
+
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-
+
+    - name: Add HTTP basic auth credentials
+      if: input.gpr_key != ''
+      run: |
+        echo '{ "http-basic": { "github.com": { "username": "build", "password": "${{ inputs.gpr_key }}" }}}' > $GITHUB_WORKSPACE/auth.json
+      shell: bash
+
+    - name: Install (prod)
+      if: inputs.prod == "true"
+      run: composer install --prefer-dist --no-dev --no-autoloader
+      shell: bash
+
+    - name: Dump autoload (prod)
+      if: inputs.prod == "true"
+      run: composer dump-autoload -n --optimize --no-dev
+      shell: bash
+
+    - name: Install (dev)
+      if: inputs.prod != "true"
+      run: composer install --prefer-dist
+      shell: bash
+
+    - name: Dump autoload (dev)
+      if: inputs.prod != "true"
+      run: composer dump-autoload -n
+      shell: bash
+
+    - name: Check platform requirements
+      if: inputs.check_platform_reqs == "true"
+      run: composer check-platform-reqs
+      shell: bash
