@@ -1,5 +1,18 @@
 name: composer
-description: Install composer dependencies
+description: |
+  Install composer dependencies
+
+  This action need checkout and php setup
+  ```yaml
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+  ```
 
 inputs:
   gpr-key:
