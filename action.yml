@@ -1,0 +1,57 @@
+name: composer
+description: |
+  Install composer dependencies
+
+  This action need checkout and php setup
+  ```yaml
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+  ```
+
+inputs:
+  gpr-key:
+    description: Personal access token to fetch private repos
+    required: false
+    default: ''
+  working-directory:
+    description: Used to change the working directory where composer will run.
+    required: false
+    default: .
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get composer cache directory
+      id: composer-cache
+      working-directory: ${{ inputs.working-directory }}
+      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      shell: bash
+
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles(format('{{0}}/**/composer.lock'), inputs.working-directory) }}
+        restore-keys: ${{ runner.os }}-composer-
+
+    - name: Add HTTP basic auth credentials
+      if: inputs.gpr-key != ''
+      run: |
+        echo '{ "http-basic": { "github.com": { "username": "build", "password": "${{ inputs.gpr-key }}" }}}' > $GITHUB_WORKSPACE/auth.json
+      shell: bash
+
+    - name: Install
+      working-directory: ${{ inputs.working-directory }}
+      run: composer install -n --prefer-dist
+      shell: bash
+
+    - name: Dump autoload
+      working-directory: ${{ inputs.working-directory }}
+      run: composer -n dump-autoload
+      shell: bash
