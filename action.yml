@@ -43,7 +43,7 @@ runs:
     - name: Add HTTP basic auth credentials
       if: inputs.gpr-key != ''
       run: |
-        echo '{ "http-basic": { "github.com": { "username": "build", "password": "${{ inputs.gpr_key }}" }}}' > $GITHUB_WORKSPACE/auth.json
+        echo '{ "http-basic": { "github.com": { "username": "build", "password": "${{ inputs.gpr-key }}" }}}' > $GITHUB_WORKSPACE/auth.json
       shell: bash
 
     - name: Install
