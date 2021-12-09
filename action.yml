@@ -20,7 +20,7 @@ inputs:
     required: false
     default: ''
   working-directory:
-    description: Used to change the working directory where yarn will run.
+    description: Used to change the working directory where composer will run.
     required: false
     default: .
 
@@ -37,7 +37,7 @@ runs:
       uses: actions/cache@v2
       with:
         path: ${{ steps.composer-cache.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        key: ${{ runner.os }}-composer-${{ hashFiles(format('{{0}}/**/composer.lock'), inputs.working-directory) }}
         restore-keys: ${{ runner.os }}-composer-
 
     - name: Add HTTP basic auth credentials
