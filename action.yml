@@ -37,7 +37,7 @@ runs:
       uses: actions/cache@v2
       with:
         path: ${{ steps.composer-cache.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ hashFiles(format('{{0}}/**/composer.lock'), inputs.working-directory) }}
+        key: ${{ runner.os }}-composer-${{ hashFiles(format('{0}/**/composer.lock', inputs.working-directory)) }}
         restore-keys: ${{ runner.os }}-composer-
 
     - name: Add HTTP basic auth credentials
