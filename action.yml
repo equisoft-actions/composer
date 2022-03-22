@@ -34,7 +34,7 @@ runs:
       shell: bash
 
     - name: Cache dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ${{ steps.composer-cache.outputs.dir }}
         key: ${{ runner.os }}-composer-${{ hashFiles(format('{0}/**/composer.lock', inputs.working-directory)) }}
