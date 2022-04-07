@@ -15,6 +15,11 @@ description: |
   ```
 
 inputs:
+  production:
+    description: |
+      Run composer optimized for production when "true"
+    required: false
+    default: 'false'
   gpr-key:
     description: Personal access token to fetch private repos
     required: false
@@ -28,16 +33,28 @@ runs:
   using: "composite"
   steps:
     - name: Get composer cache directory
-      id: composer-cache
+      id: setup
       working-directory: ${{ inputs.working-directory }}
-      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      run: |
+        CACHE_KEY=${{ runner.os }}-composer-${{ hashFiles(format('{0}/**/composer.lock', inputs.working-directory)) }}
+        INSTALL_ARGS=""
+        AUTOLOAD_ARGS=""
+        if [[ "${{ inputs.production }}" == "true" ]] ; then
+          CACHE_KEY="$CACHE_KEY-production"
+          INSTALL_ARGS="--no-dev --no-autoloader"
+          DUMP_AUTOLOAD_ARGS="--optimize --no-dev"
+        fi
+        echo "::set-output name=cache-dir::$(composer config cache-files-dir)"
+        echo "::set-output name=cache-key::$CACHE_KEY"
+        echo "::set-output name=install-args::$INSTALL_ARGS"
+        echo "::set-output name=dump-autoload-args::$DUMP_AUTOLOAD_ARGS"
       shell: bash
 
     - name: Cache dependencies
       uses: actions/cache@v3
       with:
-        path: ${{ steps.composer-cache.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ hashFiles(format('{0}/**/composer.lock', inputs.working-directory)) }}
+        path: ${{ steps.setup.outputs.cache-dir }}
+        key: ${{ steps.setup.outputs.cache-key }}
         restore-keys: ${{ runner.os }}-composer-
 
     - name: Add HTTP basic auth credentials
@@ -48,10 +65,10 @@ runs:
 
     - name: Install
       working-directory: ${{ inputs.working-directory }}
-      run: composer install -n --prefer-dist
+      run: composer install -n --prefer-dist ${{ steps.setup.outputs.install-args }}
       shell: bash
 
     - name: Dump autoload
       working-directory: ${{ inputs.working-directory }}
-      run: composer -n dump-autoload
+      run: composer -n dump-autoload ${{ steps.setup.outputs.dump-autoload-args }}
       shell: bash
