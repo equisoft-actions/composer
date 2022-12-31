@@ -44,10 +44,10 @@ runs:
           INSTALL_ARGS="--no-dev --no-autoloader"
           DUMP_AUTOLOAD_ARGS="--optimize --no-dev"
         fi
-        echo "::set-output name=cache-dir::$(composer config cache-files-dir)"
-        echo "::set-output name=cache-key::$CACHE_KEY"
-        echo "::set-output name=install-args::$INSTALL_ARGS"
-        echo "::set-output name=dump-autoload-args::$DUMP_AUTOLOAD_ARGS"
+        echo "cache-dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        echo "cache-key=$CACHE_KEY" >> $GITHUB_OUTPUT
+        echo "install-args=$INSTALL_ARGS" >> $GITHUB_OUTPUT
+        echo "dump-autoload-args=$DUMP_AUTOLOAD_ARGS" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Cache dependencies
