@@ -58,9 +58,10 @@ runs:
         restore-keys: ${{ runner.os }}-composer-
 
     - name: Add HTTP basic auth credentials
+      working-directory: ${{ inputs.working-directory }}
       if: inputs.gpr-key != ''
       run: |
-        echo '{ "http-basic": { "github.com": { "username": "build", "password": "${{ inputs.gpr-key }}" }}}' > $GITHUB_WORKSPACE/auth.json
+        echo '{ "http-basic": { "github.com": { "username": "build", "password": "${{ inputs.gpr-key }}" }}}' > auth.json
       shell: bash
 
     - name: Install
