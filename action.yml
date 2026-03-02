@@ -6,7 +6,7 @@ description: |
   ```yaml
   steps:
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -51,7 +51,7 @@ runs:
       shell: bash
 
     - name: Cache dependencies
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ${{ steps.setup.outputs.cache-dir }}
         key: ${{ steps.setup.outputs.cache-key }}
