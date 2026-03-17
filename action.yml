@@ -36,7 +36,8 @@ runs:
       id: setup
       working-directory: ${{ inputs.working-directory }}
       run: |
-        CACHE_KEY=${{ runner.os }}-composer-${{ hashFiles(format('{0}/**/composer.lock', inputs.working-directory)) }}
+        PHP_VERSION=$(php -r 'echo phpversion();')
+        CACHE_KEY=${{ runner.os }}-composer-$PHP_VERSION-${{ hashFiles(format('{0}/**/composer.lock', inputs.working-directory)) }}
         INSTALL_ARGS=""
         AUTOLOAD_ARGS=""
         if [[ "${{ inputs.production }}" == "true" ]] ; then
@@ -45,6 +46,7 @@ runs:
           DUMP_AUTOLOAD_ARGS="--optimize --no-dev"
         fi
         echo "cache-dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        echo "php-version=$PHP_VERSION" >> $GITHUB_OUTPUT
         echo "cache-key=$CACHE_KEY" >> $GITHUB_OUTPUT
         echo "install-args=$INSTALL_ARGS" >> $GITHUB_OUTPUT
         echo "dump-autoload-args=$DUMP_AUTOLOAD_ARGS" >> $GITHUB_OUTPUT
