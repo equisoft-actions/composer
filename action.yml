@@ -6,10 +6,10 @@ description: |
   ```yaml
   steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
     - name: Setup PHP
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2
       with:
         php-version: '7.4'
   ```
@@ -57,7 +57,7 @@ runs:
       shell: bash
 
     - name: Cache dependencies
-      uses: actions/cache@v5
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
       with:
         path: ${{ steps.setup.outputs.cache-dir }}
         key: ${{ steps.setup.outputs.cache-key }}
